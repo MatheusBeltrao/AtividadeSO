@@ -1,0 +1,155 @@
+import java.util.Arrays;
+import java.util.Random;
+
+public class Main {
+
+    public static void main(String[] args) {
+        int[][] matrizSwap = gerarMatrizSwap(100);
+        int[][] matrizRam = new int[10][6];
+        Random random = new Random();
+
+        for (int i = 0; i < 100; i++) {
+            matrizSwap[i][0] = i; 
+            matrizSwap[i][1] = i + 1; 
+            matrizSwap[i][2] = random.nextInt(50) + 1; 
+            matrizSwap[i][3] = 0; 
+            matrizSwap[i][4] = 0; 
+            matrizSwap[i][5] = random.nextInt(9900) + 100; 
+        }
+
+        for (int i = 0; i < 10; i++) {
+            matrizRam[i] = matrizSwap[random.nextInt(100)];
+        }
+
+       
+        for (int i = 0; i < 1000; i++) {
+            
+            int instrucao = random.nextInt(100) + 1;
+            int linhaRam = -1;
+            for (int j = 0; j < matrizRam.length; j++) {
+                if (matrizRam[j][1] == instrucao) {
+                    linhaRam = j;
+                    break;
+                }
+            }
+
+          
+            if (linhaRam == -1) {
+                int paginaSubstituida = FIFO(matrizRam);
+                matrizRam[paginaSubstituida] = matrizSwap[instrucao - 1];
+                matrizSwap[instrucao - 1][4] = 0;
+
+            } else {
+                matrizRam[linhaRam][3] = 1;
+
+                if (random.nextInt(100) < 30) {
+                    matrizRam[linhaRam][2]++;
+                    matrizRam[linhaRam][4] = 1;
+                }
+            }
+
+            RELOGIO(matrizRam);
+            WSCLOCK(matrizRam);
+        }
+
+        System.out.println("Matriz Swap inicial:");
+        System.out.println(Arrays.deepToString(matrizSwap));
+        System.out.println("Matriz Ram inicial:");
+        System.out.println(Arrays.deepToString(matrizRam));
+
+        System.out.println("Matriz Swap após FIFO:");
+        System.out.println(Arrays.deepToString(matrizSwap));
+        System.out.println("Matriz Ram após FIFO:");
+        System.out.println(Arrays.deepToString(matrizRam));
+    }
+
+
+    private static int[][] gerarMatrizSwap(int tamanho) {
+        int[][] matrizSwap = new int[tamanho][6];
+        Random random = new Random();
+
+        for (int i = 0; i < tamanho; i++) {
+            matrizSwap[i][0] = i; 
+            matrizSwap[i][1] = i + 1; 
+            matrizSwap[i][2] = random.nextInt(50) + 1; 
+            matrizSwap[i][3] = 0; 
+            matrizSwap[i][4] = 0; 
+            matrizSwap[i][5] = random.nextInt(9900) + 100; 
+        }
+
+        return matrizSwap;
+    }
+
+
+public static int FIFO(int[][] matrizRam) {
+    int paginaSubstituida = matrizRam[0][0];
+    for (int i = 1; i < matrizRam.length; i++) {
+        matrizRam[i - 1] = matrizRam[i].clone();
+    }
+    matrizRam[matrizRam.length - 1][0] = -1;
+    return paginaSubstituida;
+}
+
+public static int RELOGIO(int[][] matrizRam) {
+    int paginaSubstituida = -1;
+    for (int i = 0; i < matrizRam.length; i++) {
+        if (matrizRam[i][3] == 0) {
+            if (matrizRam[i][5] != 0) {
+                paginaSubstituida = i;
+            }
+        }
+    }
+
+    return paginaSubstituida;
+}
+
+public static int WSCLOCK(int[][] matrizRam) {
+    int paginaSubstituida = -1;
+    int bitDeAcessoMenor = Integer.MAX_VALUE;
+    int ponteiroRelogio = 0;
+
+    for (int i = 0; i < matrizRam.length; i++) {
+        if (matrizRam[i][3] == 0) {
+            if (matrizRam[i][3] < bitDeAcessoMenor) {
+                bitDeAcessoMenor = matrizRam[i][3];
+                paginaSubstituida = i;
+            }
+        } else {
+            matrizRam[i][5]++;
+
+            if (matrizRam[i][5] > matrizRam[ponteiroRelogio][5]) {
+                paginaSubstituida = i;
+            }
+        }
+    }
+
+    if (paginaSubstituida == -1) {
+        paginaSubstituida = ponteiroRelogio;
+        ponteiroRelogio = (ponteiroRelogio + 1) % matrizRam.length;
+    }
+
+    return paginaSubstituida;
+
+}
+public static int NRU(int[][] matrizRam) {
+    int index = 0;
+    for (int i = 0; i < matrizRam.length; i++) {
+        if (matrizRam[i][0] == 0 && matrizRam[i][1] == 0) {
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
+
+public static int FIFOSC(int[][] matrizRam) {
+    int index = 0;
+    for (int i = 0; i < matrizRam.length; i++) {
+        if (matrizRam[i][0] == 0) {
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
+  }    
